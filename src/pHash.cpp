@@ -7,8 +7,23 @@ extern "C"
     {
         static Php::Extension pHash("pHash", "1.0");
         pHash.add<generateHash>("phash", {Php::ByVal("filename", Php::Type::String)});
+        pHash.add<calculateDistance>("hamming_distance", {Php::ByVal("hashA", Php::Type::Numeric), Php::ByVal("hashB", Php::Type::Numeric)});
         return pHash;
     }
+}
+
+Php::Value calculateDistance(Php::Parameters &params)
+{
+    int distance = 0;
+    int64_t hashA = (int64_t)params[0];
+    int64_t hashB = (int64_t)params[1];
+    while (hashA != hashB)
+    {
+        distance += (hashA & 1) ^ (hashB & 1);
+        hashA >>= 1;
+        hashB >>= 1;
+    }
+    return distance;
 }
 
 Php::Value generateHash(Php::Parameters &params)
